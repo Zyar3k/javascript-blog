@@ -126,11 +126,9 @@ body {
 
 /* Tags cloud */
 
+
 .tags {
   a{
-
-  display: inline-flex;
-  margin: 0 5px;
   text-decoration: none;
   font-style: italic;
   font-weight: bold;
@@ -138,23 +136,23 @@ body {
 }
 
 .tag-size-1 {
-  font-size: 15px;
+  font-size: 10px;
   color: #6666ff;
 }
 .tag-size-2 {
-  font-size: 20px;
+  font-size: 15px;
   color: #1a1aff;
 }
 .tag-size-3 {
-  font-size: 25px;
+  font-size: 20px;
   color: #0000cc;
 }
 .tag-size-4 {
-  font-size: 30px;
+  font-size: 25px;
   color: #00008b;
 }
 .tag-size-5 {
-  font-size: 35px;
+  font-size: 30px;
   color: #00004d;
 }
 

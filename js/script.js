@@ -1,4 +1,12 @@
 'use strict';
+const templates = {
+  articleLink: Handlebars.compile(document.querySelector('#template-article-link').innerHTML),
+  tagsLink: Handlebars.compile(document.querySelector('#template-tags-link').innerHTML),
+  authorPostLink: Handlebars.compile(document.querySelector('#template-authorPost-link').innerHTML),
+  tagCloudLink: Handlebars.compile(document.querySelector('#template-tagCloudLink').innerHTML),
+  authorsLink: Handlebars.compile(document.querySelector('#template-authors-link').innerHTML),
+};
+
 const titleClickHandler = function(event){
   event.preventDefault();
   const clickedElement = this;
@@ -28,10 +36,9 @@ const optArticleSelector = '.post',
   optTitleListSelector = '.titles',
   optArticleTagsSelector = '.post-tags .list',
   optArticleAuthorSelector = '.post-author',
-  optTagsListSelector = '.tags.list',
-  optCloudClassCount =5,
-  optCloudClassPrefix = 'tag-size-',
-  optAuthorsListSelector = '.authors.list';
+  optCloudClassCount = 5,
+  optCloudClassPrefix = 'tag-size-';
+
 
 
 
@@ -50,11 +57,12 @@ function generateTitleLinks(customSelector = ''){
 
     const articleTitle = article.querySelector(optTitleSelector).innerHTML;
 
-    let linkHTML = '<li><a href="#' + articleId + '"><span>' + articleTitle + '</span></a></li>';
+    const linkHTMLData = {id: articleId, title: articleTitle};
+    const linkHTML = templates.articleLink(linkHTMLData);
 
     titleList.innerHTML = titleList.innerHTML + linkHTML;
 
-    html = html + linkHTML;
+    html += linkHTML;
   }
 
   titleList.innerHTML = html;
@@ -119,9 +127,11 @@ function generateTags(){
 
     for(let tag of articleTagsArray){
 
-      let linkHTML = '<li><a href="#tag-' + tag + '">' + tag + '</a></li>';
+      const linkHTMLData = {id: tag, title: tag};
+      const linkHTML = templates.tagsLink(linkHTMLData);
 
-      html = html + linkHTML;
+      html += linkHTML;
+
 
       if(!allTags.hasOwnProperty(tag)){
 
@@ -136,17 +146,22 @@ function generateTags(){
 
     const tagsParams = calculateTagsParams(allTags);
 
-    let allTagsHTML = '';
+    const allTagsData = {tags: []};
 
     for(let tag in allTags){
 
-      const tagLinkHTML ='<a class="' + calculateTagClass(allTags[tag], tagsParams) + '" href="#tag-' + tag + '" >' + tag + '</a>';
+      //const linkHTMLData = {allTags: tag,};
 
-      allTagsHTML += tagLinkHTML;
+      //const linkHTML = templates.tagCloudLink(linkHTMLData);
 
+      allTagsData.tags.push({
+        tag: tag,
+        count: allTags[tag],
+        className: calculateTagClass(allTags[tag], tagsParams)
+      });
     }
 
-    tagList.innerHTML = allTagsHTML;
+    tagList.innerHTML = templates.tagCloudLink(allTagsData);
   }
 }
 generateTags();
@@ -212,9 +227,11 @@ function generateAuthors(){
 
     const authorNames = article.getAttribute('data-author');
 
-    let linkHTML = '<li><a href="#by ' + authorNames + '">' + authorNames + '</a></li>';
 
-    html = html + linkHTML;
+    const linkHTMLData = {id: authorNames, title: authorNames};
+    const linkHTML = templates.authorPostLink(linkHTMLData);
+
+    html += linkHTML;
 
     if(!allAuthors.hasOwnProperty(authorNames)){
       allAuthors[authorNames] = 1;
@@ -226,17 +243,18 @@ function generateAuthors(){
 
   const authorList = document.querySelector('.authors');
 
-  let allAuthorsHTML = '';
+  const allAuthorsData = {allAuthors: []};
 
   for(let authorName in allAuthors){
 
-    const authorNameLinkHTML = '<a href="#by ' + authorName + '">' + authorName +  " " + '(' + allAuthors[authorName] + ')' + '</a>';
-
-    allAuthorsHTML += authorNameLinkHTML;
-
+    allAuthorsData.allAuthors.push({
+      authorName: authorName,
+      count: allAuthors[authorName],
+      className: allAuthors[authorName]
+    });
   }
+  authorList.innerHTML = templates.authorsLink(allAuthorsData);
 
-  authorList.innerHTML = allAuthorsHTML;
 }
 generateAuthors();
 
@@ -250,9 +268,11 @@ function authorClickHandler(event){
 
   const href = clickedElement.getAttribute('href');
 
-  const author = href.replace('#by', '');
 
-  const activeAuthorLinks = document.querySelectorAll('a.active[href^="#by "]');
+  const author = href.replace('#by ', '');
+
+
+  const activeAuthorLinks = document.querySelectorAll('a.active[href^="#by"]');
 
   for(let activeAuthorLink of activeAuthorLinks){
 
